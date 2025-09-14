@@ -1,0 +1,40 @@
+plugins {
+    id 'java'
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'com.artyomyarukov.web.Main'  // ← именно так!
+        )
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    archiveFileName = 'labwork1.jar'
+}
+
+
+
+
+dependencies {
+    implementation files('./libs/fastcgi-lib.jar')
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+
+
+
+
+
+test {
+    useJUnitPlatform()
+}
