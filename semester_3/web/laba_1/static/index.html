@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Проверка попадания точки в область</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+    <!-- Шапка -->
+    <header class="header">
+        <h1>Лабораторная работа по веб-программированию</h1>
+        <div class="student-info">
+            <p>Студент: Артём Яруков</p>
+            <p>Группа: P3212</p>
+            <p>Вариант: 141023</p>
+        </div>
+    </header>
+
+    <!-- Основной контент -->
+    <main class="main-content">
+        <!-- Форма ввода -->
+        <section class="form-section">
+            <h2>Параметры точки</h2>
+            <form id="pointForm" class="point-form">
+                <div class="form-group">
+                    <label for="r-value">Радиус R:</label>
+                    <select id="r-value" name="r" required>
+                        <option value="" disabled selected>Выберите R</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="x-value">Координата X:</label>
+                    <select id="x-value" name="x" required>
+                        <option value="" disabled selected>Выберите X</option>
+                        <option value="-5">-5</option>
+                        <option value="-4">-4</option>
+                        <option value="-3">-3</option>
+                        <option value="-2">-2</option>
+                        <option value="-1">-1</option>
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="y-value">Координата Y:</label>
+                    <input type="text" id="y-value" name="y" placeholder="Введите Y от -5 до 5" required
+                           pattern="-?[0-9]+(\.[0-9]+)?" title="Число от -5 до 5">
+                </div>
+
+                <button type="submit" class="submit-btn">Проверить попадание</button>
+            </form>
+        </section>
+
+        <!-- График -->
+        <section class="graph-section">
+            <h2>График области</h2>
+            <div class="graph-container">
+                <canvas id="areaGraph" width="400" height="400"></canvas>
+            </div>
+        </section>
+
+        <!-- Таблица результатов -->
+        <section class="results-section">
+            <h2>Результаты проверки</h2>
+            <div class="table-container">
+                <table id="resultsTable" class="results-table">
+                    <thead>
+                    <tr>
+                        <th>Время</th>
+                        <th>R</th>
+                        <th>X</th>
+                        <th>Y</th>
+                        <th>Результат</th>
+                        <th>Время работы</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Сюда будут добавляться результаты -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
