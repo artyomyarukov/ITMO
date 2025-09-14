@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<cities>
+    <city>
+        <id>1</id>
+        <name>sk</name>
+        <coordinates>
+            <x>13.9 </x>
+            <y>12.0</y>
+        </coordinates>
+        <creationDate>2025-03-24T22:24:55.3288235</creationDate>
+        <area>12</area>
+        <population>12</population>
+        <metersAboveSeaLevel>2</metersAboveSeaLevel>
+        <telephoneCode/>
+        <agglomeration>12</agglomeration>
+        <government>JUNTA</government>
+        <governor/>
+    </city>
+    <city>
+        <id>2</id>
+        <name>СПб</name>
+        <coordinates>
+            <x>123.0</x>
+            <y>123.0</y>
+        </coordinates>
+        <creationDate>2025-03-26T17:49:04.6444254</creationDate>
+        <area>2000</area>
+        <population>55000000</population>
+        <metersAboveSeaLevel>23</metersAboveSeaLevel>
+        <telephoneCode>812</telephoneCode>
+        <agglomeration>33444</agglomeration>
+        <government>JUNTA</government>
+        <governor>
+            <birthday>1970-12-20</birthday>
+        </governor>
+    </city>
+</cities>
