@@ -1,0 +1,111 @@
+ORG  0x0  			;	Начало программы
+V0: WORD $DEFAULT, 0x180	;	Задаём вектора прерываний
+V1: WORD $DEFAULT, 0x180
+V2: WORD $INT2, 0x180
+V3: WORD $INT3, 0x180
+V4: WORD $DEFAULT, 0x180
+V5: WORD $DEFAULT, 0x180
+V6: WORD $DEFAULT, 0x180
+V7: WORD $DEFAULT, 0x180
+
+ORG  0x043  		;	Адрес переменной X
+X: WORD ?
+MIN_X: WORD 0xFFEA	;	Минимально X по ОДЗ = -22
+MAX_X: WORD 0X13	;	Максимальное X по ОДЗ = 19
+BUF_1: WORD ?
+BUF_2: WORD ?
+BUF_3: WORD ?
+MASK: WORD 0X00FF
+RASH: WORD 0X0080
+MASK_1: WORD 0xFF00
+
+START:	
+	DI		;	Запрет прерываний	
+	CLA
+	OUT 0x1		;Записываем номер вектора прерывания 0 в регистры управления неиспользуемых ВУ
+	OUT 0x3
+	OUT 0xB
+	OUT 0xE
+	OUT 0x12
+	OUT 0x16
+	OUT 0x1A
+	OUT 0x1E
+	
+	LD #0xA
+	OUT 0x5		;	Записываем номер вектора прерывания 2 в регистр управления ВУ-2
+	LD #0xB
+	OUT 0x7		;	Записываем номер вектора прерывания 3 в регистр управления ВУ-3
+	EI 
+
+MAIN:		
+	DI		;	Запрещаем прерывания, чтобы не вызвать прерывания при выходе за ОДЗ
+	LD $X
+	INC
+	CALL CHECK
+	ST $X
+	EI
+	JUMP MAIN
+	
+CHECK:			;	Проверяем, не вышел ли X за ОДЗ
+	CMP $MAX_X
+	BGE LD_MIN
+	CMP $MIN_X
+	BGE RETURN
+
+	
+LD_MIN:
+	LD $MIN_X
+	
+RETURN: 
+	RET
+
+INT3:
+	DI
+	CLA
+	SUB $X
+	SUB $X
+	SUB $X
+	SUB $X
+	SUB $X
+	SUB $X
+	SUB #9
+	OUT 0x6		;	Выводим результат на ВУ-3
+	EI
+	IRET
+
+
+     
+
+INT2:
+	DI
+	IN 0x4		;	Вводим значение с ВУ-2
+	ST $BUF_1 ;XNOR -  (A∧B)∨(¬A∧¬B)
+	AND $X
+	ST $BUF_2    ; (A∧B)
+	LD $BUF_1    
+	NOT ; ¬A
+	ST $BUF_1
+	LD $X
+	NOT ; ¬B
+	AND $BUF_1
+	OR $BUF_2
+	AND $MASK
+	ST $BUF_3
+	AND $RASH
+	BNE TO_16
+	PROD: LD $BUF_3
+	CALL CHECK
+	ST $X
+	EI
+	IRET
+	          
+DEFAULT: IRET	;	Обработка прерывания по умолчанию
+
+TO_16:
+      LD $BUF_3
+      ADD $MASK_1
+      ST $BUF_3
+      JUMP PROD
+      
+     
+

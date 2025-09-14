@@ -1,0 +1,105 @@
+
+ORG 0x100
+CUR_1: WORD 0X500
+CUR_2: WORD 0X600
+ITER: WORD 0X8
+I: WORD 0X0
+J: WORD 0X0
+LEN: WORD 0X7
+SWAM_FUNC:
+		   CLA
+		   LD CUR_1
+		   ST I
+		   LD ITER
+		   ST LEN
+		   LD CUR_2
+		   ST J
+   SWAM_X:
+		   LD (I)+
+		   ST (J)+
+		   LOOP LEN
+		  JUMP SWAM_X
+   CLA
+   LD CUR_1
+   INC
+   ST I
+   LD ITER
+   DEC
+   ST LEN
+   LD CUR_2
+   ST J
+   SWAM_Y:
+       LD (J)+
+       ST (I)+
+       LOOP LEN
+       JUMP SWAM_Y
+   RET         
+
+
+SRMASK:			WORD	0x0040
+DRMASK: 			WORD	0x00FF
+POSMASK:			WORD	0x0000
+BREAK:				WORD 	0x000D
+BUFF:				WORD   	0x0000
+NULL: 				WORD 0X0000
+PRIB:  				WORD 0X0010
+P_POSMASK: 		WORD 0X0000
+
+ORG 0x140
+READ:
+	RSPINLOOP:	IN			0x1D						; ЧИТАЕМ SR ВУ-9
+						AND		SRMASK
+						BZS		RSPINLOOP
+						IN			0x1C						; ЧИТАЕМ DR ВУ-9
+						ST 		BUFF
+						PUSH
+						CALL SWAM_FUNC
+						POP
+						LD BUFF
+						ST (CUR_1)
+						ST &1
+						RET
+
+ORG 0x150
+WRITE:
+	WSPINLOOP:
+						IN 			0x15						; ЧИТАЕМ SR ВУ-7
+						AND 		SRMASK
+						BZS		WSPINLOOP
+                               LD CUR_1
+		                     ST I
+		                     LD ITER
+		                     ST LEN
+		                     LD P_POSMASK
+		                     ST POSMASK
+		                     SWAM_Q:
+		                               LD (I)+
+		                               OR POSMASK
+								OUT 		0x14 ; ПИШЕМ  DR ВУ-7
+								LD POSMASK
+								ADD PRIB
+								ST POSMASK
+								LOOP LEN 
+							    JUMP SWAM_Q
+						RET		
+
+ORG 0x170
+START:
+	CYCLE:
+						CLA
+						PUSH
+						CALL 	$READ
+						POP
+						AND 		DRMASK
+						CMP		BREAK
+						BZS		TERMINATE
+						PUSH
+						CALL 	$WRITE
+						POP
+						JUMP		CYCLE
+	TERMINATE:				
+						HLT
+
+
+
+			
