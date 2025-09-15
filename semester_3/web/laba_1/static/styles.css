@@ -213,3 +213,96 @@ h2 {
 .form-section { animation-delay: 0.1s; }
 .graph-section { animation-delay: 0.2s; }
 .results-section { animation-delay: 0.3s; }
+
+
+
+/* Стили для результатов */
+.hit {
+    color: #27ae60;
+    font-weight: bold;
+}
+
+.miss {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.error-message {
+    color: #e74c3c;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+/* Анимации для таблицы */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Стили для canvas */
+#areaGraph {
+    background: #ffffff;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: box-shadow 0.3s ease;
+}
+
+#areaGraph:hover {
+    box-shadow: 0 0 15px rgba(52, 152, 219, 0.3);
+}
+
+/* Адаптивность для таблицы */
+@media (max-width: 768px) {
+    .results-table {
+        font-size: 0.8em;
+    }
+
+    .results-table th,
+    .results-table td {
+        padding: 8px 10px;
+    }
+}
+
+/* Стили для группы чекбоксов */
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px solid #bdc3c7;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.checkbox-group label:hover {
+    background-color: #f1f2f6;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+/* Адаптивность для чекбоксов */
+@media (max-width: 480px) {
+    .checkbox-group {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
