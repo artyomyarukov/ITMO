@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const canvas = document.getElementById('areaGraph');
     const ctx = canvas.getContext('2d');
 
+
+    loadHistoryOnStart();
     // Инициализация графика с текущим значением R
     const initialR = parseFloat(rSelect.value) || 3;
     drawGraph(initialR);
@@ -107,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return false;
         }
 
-        if (yNum < -5 || yNum > 3) {  // ИЗМЕНИЛ на -5 до 3!
+        if (yNum < -5 || yNum > 3) {
             errorElement.textContent = 'Y должно быть в диапазоне от -5 до 3';
             return false;
         }
@@ -125,11 +127,19 @@ document.addEventListener('DOMContentLoaded', function () {
         return errorElement;
     }
 
+
     // Отправка AJAX запроса
     function sendRequest(formData) {
         // Получаем выбранный X
         const selectedX = document.querySelector('input[name="x"]:checked').value;
-        formData.set('x', selectedX);
+        const rValue = document.getElementById('r-value').value;
+        const yValue = document.getElementById('y-value').value;
+
+
+        const params = new URLSearchParams();
+        params.append('x', selectedX);
+        params.append('y', yValue);
+        params.append('r', rValue);
 
         const submitBtn = form.querySelector('.submit-btn');
         const originalText = submitBtn.textContent;
@@ -140,8 +150,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         fetch('/calculate', {
             method: 'POST',
-            body: formData,
+            body: params,
             headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
                 'Accept': 'application/json'
             }
         })
@@ -180,7 +191,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <td>${data.x}</td>
             <td>${data.y}</td>
             <td class="${data.result ? 'hit' : 'miss'}">
-                ${data.result ? '✅ Попадание' : '❌ Промах'}
+                ${data.result ? ' Попадание' : ' Промах'}
             </td>
             <td>${data.executionTime} мс</td>
         `;
@@ -189,6 +200,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Анимация добавления
         row.style.animation = 'fadeIn 0.5s ease-out';
+        saveToHistory(data);
     }
 
     // Отрисовка графика
@@ -201,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Очистка canvas
         ctx.clearRect(0, 0, width, height);
 
-        // Сетка и оси, пока не понимаю как выравнить по сетке
+        // Сетка и оси
         //drawGrid(width, height, scale, padding);
         drawAxes(width, height, padding, scale);
 
@@ -454,3 +466,80 @@ async function loadHistory() {
         console.error('Ошибка загрузки истории:', error);
     }
 }
+
+
+
+// Сохранение результата в историю
+function saveToHistory(data) {
+    // Получаем текущую историю или создаем пустую
+    let history = JSON.parse(localStorage.getItem('pointHistory') || '[]');
+
+    // Добавляем новый результат в начало
+    history.unshift(data);
+
+    // Ограничиваем историю 50 последними результатами
+    if (history.length > 50) {
+        history = history.slice(0, 50);
+    }
+
+    // Сохраняем обратно в localStorage
+    localStorage.setItem('pointHistory', JSON.stringify(history));
+}
+
+// Загрузка истории при старте
+function loadHistoryOnStart() {
+    const history = JSON.parse(localStorage.getItem('pointHistory') || '[]');
+
+    history.forEach(data => {
+        // добавляем строки в таблицу
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${new Date(data.timestamp).toLocaleString()}</td>
+            <td>${data.r}</td>
+            <td>${data.x}</td>
+            <td>${data.y}</td>
+            <td class="${data.result ? 'hit' : 'miss'}">
+                ${data.result ? 'Попадание' : 'Промах'}
+            </td>
+            <td>${data.executionTime} мс</td>
+        `;
+        resultsTable.appendChild(row);
+    });
+}
+
+// Очистка истории
+function clearHistory() {
+    if (confirm('Очистить всю историю результатов?')) {
+        localStorage.removeItem('pointHistory');
+        // Очищаем таблицу, оставляя заголовок
+        resultsTable.innerHTML = `
+            <thead>
+                <tr>
+                    <th>Время</th>
+                    <th>R</th>
+                    <th>X</th>
+                    <th>Y</th>
+                    <th>Результат</th>
+                    <th>Время работы</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        `;
+        resultsTable = document.getElementById('resultsTable').querySelector('tbody');
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

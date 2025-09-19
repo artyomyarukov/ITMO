@@ -1,14 +1,108 @@
 package com.artyomyarukov.web;
 
+import com.fastcgi.FCGIInterface;
+
+import java.io.BufferedOutputStream;
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Scanner;
 
 public class Main {
+
+    private static final String HTTP_RESPONSE = """
+            Content-Type: application/json
+            Content-Length: %d
+            
+            %s
+            """;
+
+    private static final String HTTP_ERROR = """
+            Content-Type: application/json
+            Content-Length: %d
+            
+            %s
+            """;
+
+
     public static void main(String[] args) {
+        FCGIInterface fcgi = new FCGIInterface();
+        PrintStream output = new PrintStream(new BufferedOutputStream(new FileOutputStream(FileDescriptor.out), 128), true);
 
-        System.out.printf("Hello and welcome!\n");
 
-        for (int i = 1; i <= 5; i++) {
+        System.out.println("Starting FastCGI server...");
 
-            System.out.println("i = " + i);
+        while (fcgi.FCGIaccept() >= 0) {
+            try {
+                // Получаем параметры из FastCGI
+                Scanner sc = new Scanner(System.in);
+                String queryString = sc.nextLine();
+                if (queryString == null) {
+                    queryString = "";
+                }
+
+                output.println("хуй халупа");
+                output.println("Query String: " + queryString);
+
+
+                // Парсим параметры
+                Params params = new Params(queryString);
+
+                // Замер времени выполнения
+                Instant startTime = Instant.now();
+                boolean result = AreaChecker.checkHit(params.getX(), params.getY(), params.getR());
+                output.println("халупа распарсился");
+                Instant endTime = Instant.now();
+                long executionTime = ChronoUnit.NANOS.between(startTime, endTime);
+
+                // Формируем JSON ответ
+                String json = String.format(
+                        "{\"success\":true,\"result\":%b,\"x\":%.2f,\"y\":%.2f,\"r\":%.2f,\"timestamp\":\"%s\",\"executionTime\":%d}",
+                        result, params.getX(), params.getY(), params.getR(),
+                        LocalDateTime.now(), executionTime / 1000000
+                );
+                output.println("халупа джсон сформировался");
+
+                // Формируем HTTP ответ
+                String response = String.format(
+                        HTTP_RESPONSE,
+                        json.getBytes(StandardCharsets.UTF_8).length,
+                        json
+                );
+                output.println(response);
+
+                // Отправляем ответ
+                System.out.print(response);
+
+            } catch (ValidationException e) {
+                // Обработка ошибок валидации
+                String errorJson = String.format(
+                        "{\"success\":false,\"message\":\"%s\"}",
+                        e.getMessage()
+                );
+
+                String errorResponse = String.format(
+                        HTTP_ERROR,
+                        errorJson.getBytes(StandardCharsets.UTF_8).length,
+                        errorJson
+                );
+
+                System.out.print(errorResponse);
+            } catch (Exception e) {
+                // Обработка других ошибок
+                String errorJson = "{\"success\":false,\"message\":\"Internal server error\"}";
+                String errorResponse = String.format(
+                        HTTP_ERROR,
+                        errorJson.getBytes(StandardCharsets.UTF_8).length,
+                        errorJson
+                );
+
+                System.out.print(errorResponse);
+            }
         }
     }
 }

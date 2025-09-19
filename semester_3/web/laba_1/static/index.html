@@ -11,7 +11,7 @@
     <header class="header">
         <h1>Лабораторная работа по веб-программированию</h1>
         <div class="student-info">
-            <p>Студент: Артём Яруков</p>
+            <p>Студент: Яруков Артём Дмитриевич </p>
             <p>Группа: P3212</p>
             <p>Вариант: 468197</p>
         </div>
@@ -20,7 +20,7 @@
     <!-- Основной контент -->
     <main class="main-content">
         <!-- Форма ввода -->
-        <!-- Замени блок формы на этот -->
+
         <section class="form-section">
             <h2>Параметры точки</h2>
             <form id="pointForm" class="point-form">
@@ -75,6 +75,12 @@
         <!-- Таблица результатов -->
         <section class="results-section">
             <h2>Результаты проверки</h2>
+            <div style="margin-bottom: 15px;">
+                <button onclick="clearHistory()"
+                        style="background: #e74c3c; color: white; padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer;">
+                     Очистить историю
+                </button>
+            </div>
             <div class="table-container">
                 <table id="resultsTable" class="results-table">
                     <thead>
