@@ -9,10 +9,22 @@ repositories {
     mavenCentral()
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+
 jar {
     manifest {
         attributes(
-                'Main-Class': 'com.artyomyarukov.web.Main'  // ← именно так!
+                'Main-Class': 'com.artyomyarukov.web.Main'
         )
     }
     from {

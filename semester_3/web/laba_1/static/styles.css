@@ -1,4 +1,3 @@
-/* Базовые стили */
 * {
     margin: 0;
     padding: 0;
@@ -28,9 +27,13 @@ body {
     padding: 30px;
     text-align: center;
 }
+.form-section > h2 {
+    color: #2c3e50;
+
+}
 
 .header h1 {
-    font-family: 'cursive', 'Comic Sans MS', sans-serif;
+    font-family: cursive, 'Comic Sans MS', sans-serif;
     font-size: 2.5em;
     margin-bottom: 15px;
     color: #ecf0f1;
@@ -54,20 +57,32 @@ body {
 /* Основной контент */
 .main-content {
     padding: 30px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
 }
 
+/* Табличная верстка */
+.layout-table {
+    width: 100%;
+    border-spacing: 30px;
+}
+
+.layout-table td {
+    vertical-align: top;
+}
+
+.form-cell, .graph-cell {
+    width: 50%;
+}
+
+.results-cell {
+    width: 100%;
+}
+
+/* Секции */
 .form-section, .graph-section, .results-section {
     background: #f8f9fa;
     padding: 25px;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-.results-section {
-    grid-column: 1 / -1;
 }
 
 h2 {
@@ -129,10 +144,6 @@ h2 {
     box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
 }
 
-.submit-btn:active {
-    transform: translateY(0);
-}
-
 /* График */
 .graph-container {
     display: flex;
@@ -147,9 +158,16 @@ h2 {
 #areaGraph {
     border: 1px solid #34495e;
     border-radius: 5px;
+    background: #ffffff;
+    cursor: pointer;
+    transition: box-shadow 0.3s ease;
 }
 
-/* Таблица */
+#areaGraph:hover {
+    box-shadow: 0 0 15px rgba(52, 152, 219, 0.3);
+}
+
+/* Таблица результатов */
 .table-container {
     overflow-x: auto;
 }
@@ -184,92 +202,7 @@ h2 {
     background: #e8f4fc;
 }
 
-/* Адаптивность */
-@media (max-width: 768px) {
-    .main-content {
-        grid-template-columns: 1fr;
-    }
-
-    .student-info {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .header h1 {
-        font-size: 2em;
-    }
-}
-
-/* Анимации */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.form-section, .graph-section, .results-section {
-    animation: fadeIn 0.6s ease-out;
-}
-
-.form-section { animation-delay: 0.1s; }
-.graph-section { animation-delay: 0.2s; }
-.results-section { animation-delay: 0.3s; }
-
-
-
-/* Стили для результатов */
-.hit {
-    color: #27ae60;
-    font-weight: bold;
-}
-
-.miss {
-    color: #e74c3c;
-    font-weight: bold;
-}
-
-.error-message {
-    color: #e74c3c;
-    font-size: 0.9em;
-    margin-top: 5px;
-}
-
-/* Анимации для таблицы */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Стили для canvas */
-#areaGraph {
-    background: #ffffff;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: box-shadow 0.3s ease;
-}
-
-#areaGraph:hover {
-    box-shadow: 0 0 15px rgba(52, 152, 219, 0.3);
-}
-
-/* Адаптивность для таблицы */
-@media (max-width: 768px) {
-    .results-table {
-        font-size: 0.8em;
-    }
-
-    .results-table th,
-    .results-table td {
-        padding: 8px 10px;
-    }
-}
-
-/* Стили для группы чекбоксов */
+/* Чекбоксы */
 .checkbox-group {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -300,9 +233,19 @@ h2 {
     cursor: pointer;
 }
 
-/* Адаптивность для чекбоксов */
-@media (max-width: 480px) {
-    .checkbox-group {
-        grid-template-columns: repeat(2, 1fr);
-    }
+/* Мелкие стили */
+.hit {
+    color: #27ae60;
+    font-weight: bold;
+}
+
+.miss {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.error-message {
+    color: #e74c3c;
+    font-size: 0.9em;
+    margin-top: 5px;
 }

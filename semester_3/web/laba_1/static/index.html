@@ -11,7 +11,7 @@
     <header class="header">
         <h1>Лабораторная работа по веб-программированию</h1>
         <div class="student-info">
-            <p>Студент: Яруков Артём Дмитриевич </p>
+            <p>Студент: Яруков Артём Дмитриевич</p>
             <p>Группа: P3212</p>
             <p>Вариант: 468197</p>
         </div>
@@ -19,86 +19,100 @@
 
     <!-- Основной контент -->
     <main class="main-content">
-        <!-- Форма ввода -->
+        <table class="layout-table">
+            <tr>
+                <!-- Левая колонка: форма -->
+                <td class="form-cell">
+                    <section class="form-section">
+                        <h2>Параметры точки</h2>
+                        <form id="pointForm" class="point-form" method="POST">
+                            <!-- Радиус R -->
+                            <div class="form-group">
+                                <label for="r-value">Радиус R:</label>
+                                <select id="r-value" name="r" required>
+                                    <option value="" disabled selected>Выберите R</option>
+                                    <option value="1">1</option>
+                                    <option value="1.5">1.5</option>
+                                    <option value="2">2</option>
+                                    <option value="2.5">2.5</option>
+                                    <option value="3">3</option>
+                                </select>
+                            </div>
 
-        <section class="form-section">
-            <h2>Параметры точки</h2>
-            <form id="pointForm" class="point-form">
-                <!-- Радиус R -->
-                <div class="form-group">
-                    <label for="r-value">Радиус R:</label>
-                    <select id="r-value" name="r" required>
-                        <option value="" disabled selected>Выберите R</option>
-                        <option value="1">1</option>
-                        <option value="1.5">1.5</option>
-                        <option value="2">2</option>
-                        <option value="2.5">2.5</option>
-                        <option value="3">3</option>
-                    </select>
-                </div>
+                            <!-- Координата X -->
+                            <div class="form-group">
+                                <label for="x-value">Координата X:</label>
+                                <input type="hidden" id="x-value">
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" name="x" value="-3"> -3</label>
+                                    <label><input type="checkbox" name="x" value="-2"> -2</label>
+                                    <label><input type="checkbox" name="x" value="-1"> -1</label>
+                                    <label><input type="checkbox" name="x" value="0"> 0</label>
+                                    <label><input type="checkbox" name="x" value="1"> 1</label>
+                                    <label><input type="checkbox" name="x" value="2"> 2</label>
+                                    <label><input type="checkbox" name="x" value="3"> 3</label>
+                                    <label><input type="checkbox" name="x" value="4"> 4</label>
+                                    <label><input type="checkbox" name="x" value="5"> 5</label>
+                                </div>
+                            </div>
 
-                <!-- Координата X -->
-                <div class="form-group">
-                   <label for="x-value">Координата X:</label>
-                    <input type="hidden" id="x-value">
-                    <div class="checkbox-group">
-                        <label><input type="checkbox" name="x" value="-3"> -3</label>
-                        <label><input type="checkbox" name="x" value="-2"> -2</label>
-                        <label><input type="checkbox" name="x" value="-1"> -1</label>
-                        <label><input type="checkbox" name="x" value="0"> 0</label>
-                        <label><input type="checkbox" name="x" value="1"> 1</label>
-                        <label><input type="checkbox" name="x" value="2"> 2</label>
-                        <label><input type="checkbox" name="x" value="3"> 3</label>
-                        <label><input type="checkbox" name="x" value="4"> 4</label>
-                        <label><input type="checkbox" name="x" value="5"> 5</label>
-                    </div>
-                </div>
+                            <!-- Координата Y -->
+                            <div class="form-group">
+                                <label for="y-value">Координата Y:</label>
+                                <input type="text" id="y-value" name="y"
+                                       placeholder="Введите Y от -5 до 3" required
+                                       pattern="-?[0-9]+(\.[0-9]+)?"
+                                       title="Число от -5 до 3">
+                            </div>
 
-                <!-- Координата Y -->
-                <div class="form-group">
-                    <label for="y-value">Координата Y:</label>
-                    <input type="text" id="y-value" name="y" placeholder="Введите Y от -5 до 3" required
-                           pattern="-?[0-9]+(\.[0-9]+)?" title="Число от -5 до 3">
-                </div>
+                            <button type="submit" class="submit-btn">Проверить попадание</button>
+                        </form>
+                    </section>
+                </td>
 
-                <button type="submit" class="submit-btn">Проверить попадание</button>
-            </form>
-        </section>
-        <!-- График -->
-        <section class="graph-section">
-            <h2>График области</h2>
-            <div class="graph-container">
-                <canvas id="areaGraph" width="400" height="400"></canvas>
-            </div>
-        </section>
+                <!-- Правая колонка: график -->
+                <td class="graph-cell">
+                    <section class="graph-section">
+                        <h2>График области</h2>
+                        <div class="graph-container">
+                            <canvas id="areaGraph" width="400" height="400"></canvas>
+                        </div>
+                    </section>
+                </td>
+            </tr>
 
-        <!-- Таблица результатов -->
-        <section class="results-section">
-            <h2>Результаты проверки</h2>
-            <div style="margin-bottom: 15px;">
-                <button onclick="clearHistory()"
-                        style="background: #e74c3c; color: white; padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer;">
-                     Очистить историю
-                </button>
-            </div>
-            <div class="table-container">
-                <table id="resultsTable" class="results-table">
-                    <thead>
-                    <tr>
-                        <th>Время</th>
-                        <th>R</th>
-                        <th>X</th>
-                        <th>Y</th>
-                        <th>Результат</th>
-                        <th>Время работы</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!-- Сюда будут добавляться результаты -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
+            <!-- Результаты (на всю ширину) -->
+            <tr>
+                <td colspan="2" class="results-cell">
+                    <section class="results-section">
+                        <h2>Результаты проверки</h2>
+                        <div style="margin-bottom: 15px;">
+                            <button onclick="clearHistory()"
+                                    style="background: #e74c3c; color: white; padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer;">
+                                Очистить историю
+                            </button>
+                        </div>
+                        <div class="table-container">
+                            <table id="resultsTable" class="results-table">
+                                <thead>
+                                <tr>
+                                    <th>Время</th>
+                                    <th>R</th>
+                                    <th>X</th>
+                                    <th>Y</th>
+                                    <th>Результат</th>
+                                    <th>Время работы</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <!-- сюда будут добавляться результаты -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </td>
+            </tr>
+        </table>
     </main>
 </div>
 

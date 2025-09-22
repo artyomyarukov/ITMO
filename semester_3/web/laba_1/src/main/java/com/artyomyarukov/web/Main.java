@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class Main {
@@ -45,7 +46,7 @@ public class Main {
                     queryString = "";
                 }
 
-                output.println("хуй халупа");
+                output.println("получили параметры");
                 output.println("Query String: " + queryString);
 
 
@@ -55,17 +56,19 @@ public class Main {
                 // Замер времени выполнения
                 Instant startTime = Instant.now();
                 boolean result = AreaChecker.checkHit(params.getX(), params.getY(), params.getR());
-                output.println("халупа распарсился");
+                output.println("распарсился");
                 Instant endTime = Instant.now();
-                long executionTime = ChronoUnit.NANOS.between(startTime, endTime);
+                double executionTime = ChronoUnit.NANOS.between(startTime, endTime);
 
                 // Формируем JSON ответ
                 String json = String.format(
-                        "{\"success\":true,\"result\":%b,\"x\":%.2f,\"y\":%.2f,\"r\":%.2f,\"timestamp\":\"%s\",\"executionTime\":%d}",
+                        Locale.US,
+                        "{\"success\":true,\"result\":%b,\"x\":%.2f,\"y\":%.2f,\"r\":%.2f,\"timestamp\":\"%s\",\"executionTime\":%f}",
                         result, params.getX(), params.getY(), params.getR(),
-                        LocalDateTime.now(), executionTime / 1000000
+                        LocalDateTime.now(), executionTime / 1000000.0
                 );
-                output.println("халупа джсон сформировался");
+
+                output.println("json сформировался");
 
                 // Формируем HTTP ответ
                 String response = String.format(
