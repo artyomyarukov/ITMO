@@ -1,0 +1,209 @@
+/* Общие стили */
+body {
+    font-family: Arial, sans-serif;
+    margin: 40px;
+    background-color: #f5f5f5;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* Секции */
+.form-section, .results-section, .graph-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Таблица */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 15px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* Результаты */
+.hit {
+    color: green;
+    font-weight: bold;
+}
+
+.miss {
+    color: red;
+    font-weight: bold;
+}
+
+/* Форма */
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="text"], select {
+    width: 200px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* Ошибки */
+.error {
+    color: red;
+    background-color: #ffe6e6;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border: 1px solid red;
+}
+
+/* График */
+#graph {
+    width: 400px;
+    height: 400px;
+    border: 2px solid #333;
+    background: #f8f8f8;
+    position: relative;
+}
+
+/* Ссылки */
+.back-link {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.back-link:hover {
+    background: #0056b3;
+}
+
+
+
+/* Стили для полей с ошибками */
+.error-field {
+    border: 2px solid red !important;
+    background-color: #ffe6e6;
+}
+
+.field-error {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* Стили для canvas */
+#graphCanvas {
+    width: 400px;
+    height: 400px;
+    border: 2px solid #333;
+    background: #f8f8f8;
+    cursor: crosshair;
+}
+
+
+/* Подсказка для canvas */
+.canvas-hint {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.clear-button {
+    background-color: #ff4444;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.clear-button:hover {
+    background-color: #cc0000;
+}
+
+
+/* Стили для кнопок радиуса */
+.radius-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.radius-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #f0f0f0;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    min-width: 40px;
+    transition: all 0.3s;
+}
+
+.radius-btn:hover {
+    background-color: #e0e0e0;
+    border-color: #ccc;
+}
+
+input[type="radio"] {
+    display: none;
+}
+
+input[type="radio"]:checked + .radius-btn {
+    background-color: #4CAF50;
+    color: white;
+    border-color: #45a049;
+}
+
+.form-group small {
+    display: block;
+    color: #666;
+    font-size: 12px;
+    margin-top: 5px;
+}
