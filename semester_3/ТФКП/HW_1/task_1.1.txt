@@ -1,0 +1,54 @@
+figure('Name','Задание 1.1');
+
+subplot(2,2,1)
+plot(w,abs(W1_w),'LineWidth',1.3)
+grid on
+xlim([-60 60])
+xlabel('\omega')
+ylabel('|W_1(j\omega)|')
+title('АЧХ фильтра первого порядка')
+
+subplot(2,2,2)
+plot(t,g,'LineWidth',1.3); hold on
+plot(t,u)
+plot(t,y_lsim,'LineWidth',1.3)
+grid on
+xlabel('t')
+ylabel('Амплитуда')
+legend('g(t)','u(t)','y(t)')
+title('Сигналы во времени')
+
+subplot(2,2,3)
+plot(t,y_lsim,'LineWidth',1.3); hold on
+plot(t,y_fft,'--','LineWidth',1.3)
+grid on
+xlabel('t')
+ylabel('Амплитуда')
+legend('y_{lsim}','y_{FFT}')
+title('Сравнение y_{lsim} и y_{FFT}')
+
+subplot(2,2,4)
+idx = abs(w) < 60;
+plot(w(idx),abs(G(idx)),'LineWidth',1.3); hold on
+plot(w(idx),abs(U(idx)))
+plot(w(idx),abs(Y_lsim(idx)),'LineWidth',1.3)
+grid on
+xlabel('\omega')
+ylabel('|.|')
+legend('|G|','|U|','|Y|')
+title('Модули спектров')
+
+
+
+figure('Name','Сравнение спектров');
+
+Y_prod = W1_w .* U;
+
+idx = abs(w) < 60;
+plot(w(idx), abs(Y_lsim(idx)), 'LineWidth', 1.3); hold on;
+plot(w(idx), abs(Y_prod(idx)), '--', 'LineWidth', 1.3);
+grid on;
+xlabel('\omega');
+ylabel('Модуль спектра');
+legend('|Y(\omega)|', '|W_1(j\omega)\cdot U(\omega)|');
+title('Сравнение |Y(\omega)| и |W_1(j\omega)\cdot U(\omega)|');

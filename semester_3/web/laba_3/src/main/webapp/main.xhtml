@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <title>Проверка точки</title>
+    <h:outputStylesheet name="css/style.css" />
+    <h:outputScript name="js/map.js" target="body" />
+</h:head>
+<h:body>
+    <header>
+        <div class="header-content">
+            <h1>Яруков Артём Дмитриевич | Группа: P3212 | Вариант: 473316 </h1>
+        </div>
+    </header>
+
+    <div class="content">
+        <h:form id="mainForm">
+            <h:inputHidden id="xCanvas" value="#{pointBean.x}" />
+            <h:inputHidden id="yCanvas" value="#{pointBean.y}" />
+            <h:inputHidden id="rCanvas" value="#{pointBean.r}" />
+
+            <p:remoteCommand name="addPointFromCanvas"
+                             action="#{pointBean.checkArea}"
+                             process="@this xCanvas yCanvas rCanvas"
+                             update="resultsTable plotPanel pointsData"
+                             oncomplete="redrawGraph()" />
+
+            <div class="grid-container">
+                <h:panelGroup id="plotPanel" layout="block" styleClass="plot-card">
+                    <canvas id="mapCanvas" width="400" height="400"></canvas>
+                </h:panelGroup>
+
+                <div class="input-card">
+                    <h3>Параметры</h3>
+
+                    <div class="input-group x-buttons-group">
+                        <label>X:</label>
+                        <p:selectOneButton value="#{pointBean.x}" required="true">
+                            <f:selectItem itemValue="-4" itemLabel="-4" />
+                            <f:selectItem itemValue="-3" itemLabel="-3" />
+                            <f:selectItem itemValue="-2" itemLabel="-2" />
+                            <f:selectItem itemValue="-1" itemLabel="-1" />
+                            <f:selectItem itemValue="0" itemLabel="0" />
+                            <f:selectItem itemValue="1" itemLabel="1" />
+                            <f:selectItem itemValue="2" itemLabel="2" />
+                            <f:selectItem itemValue="3" itemLabel="3" />
+                            <f:selectItem itemValue="4" itemLabel="4" />
+
+                            <p:ajax update="xOutput" />
+                        </p:selectOneButton>
+                        <p:message for="@previous" />
+                    </div>
+
+                    <div class="input-group">
+                        <label>Текущий X: <h:outputText id="xOutput" value="#{pointBean.x}" /></label>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Y (-3 ... 5):</label>
+                        <p:inputText id="yInput" value="#{pointBean.y}" required="true" placeholder="Введите Y (от -3 до 5)"
+                                     onkeypress="return /[0-9.\-]/.test(event.key)">
+                            <f:validateDoubleRange minimum="-3" maximum="5" />
+                        </p:inputText>
+                        <p:message for="yInput" />
+                    </div>
+
+                    <div class="input-group">
+                        <label>R:</label>
+                        <h:outputText id="rOutput" value="#{pointBean.r}" />
+                        <h:inputHidden id="rSliderInput" value="#{pointBean.r}" />
+
+                        <p:slider for="rSliderInput"
+                                  display="rOutput"
+                                  minValue="2.0"
+                                  maxValue="5.0"
+                                  step="0.1"
+                                  range="false">
+
+                            <p:ajax event="slideEnd"
+                                    process="rSliderInput"
+                                    oncomplete="updateR()" />
+
+                        </p:slider>
+                    </div>
+
+                    <div class="action-buttons">
+                        <p:commandButton value="Проверить"
+                                         action="#{pointBean.checkArea}"
+                                         process="@form"
+                                         update="resultsTable plotPanel @form pointsData rOutput"
+                                         oncomplete="syncRValue(); redrawGraph()"
+                                         styleClass="ui-button-primary"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <p:dataTable id="resultsTable" value="#{pointBean.results}" var="point"
+                             emptyMessage="Нет данных" styleClass="results-table">
+                    <p:column headerText="X">
+                        <h:outputText value="#{point.x}" />
+                    </p:column>
+                    <p:column headerText="Y">
+                        <h:outputText value="#{point.y}" />
+                    </p:column>
+                    <p:column headerText="R">
+                        <h:outputText value="#{point.r}" />
+                    </p:column>
+                    <p:column headerText="Результат">
+                        <h:outputText value="#{point.hit ? 'Попал' : 'Мимо'}" styleClass="#{point.hit ? 'status-hit' : 'status-miss'}" />
+                    </p:column>
+                    <p:column headerText="Время">
+                        <h:outputText value="#{point.date}" />
+                    </p:column>
+                </p:dataTable>
+            </div>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <h:link outcome="index" value="Вернуться на стартовую" styleClass="back-link"/>
+            </div>
+
+            <h:panelGroup id="pointsData">
+                <script>
+                    window.rawServerPoints = '#{pointBean.jsonResults}';
+                    // Вызовем функцию, которая обработает строку
+                    if (window.rawServerPoints &amp;&amp; window.rawServerPoints.trim() !== '') {
+                        try {
+                            // ПРЕОБРАЗОВАНИЕ JSON:
+                            window.serverPoints = JSON.parse(window.rawServerPoints);
+                        } catch (e) {
+                            console.error("Ошибка парсинга JSON:", e);
+                            window.serverPoints = [];
+                        }
+                    } else {
+                        window.serverPoints = [];
+                    }
+
+                    // Перерисуем график после загрузки точек
+                    redrawGraph();
+                </script>
+            </h:panelGroup>
+        </h:form>
+    </div>
+</h:body>
+</html>

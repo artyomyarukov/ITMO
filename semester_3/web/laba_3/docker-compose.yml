@@ -1,0 +1,38 @@
+services:
+  wildfly:
+    build: .
+    container_name: wildfly-app
+    # Проброс портов: 8080 для HTTP-приложения, 9990 для управления WildFly (Management Console)
+    ports:
+      - "8080:8080"
+      - "9990:9990"
+    # Зависимость от базы данных
+    depends_on:
+      - postgres
+    # Переменные окружения для подключения к БД (используются в forDockerStandalone.xml)
+    environment:
+      DB_HOST: postgres  # Имя сервиса БД в Docker Compose
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: newpassword
+      DB_NAME: your_db_name
+    # Настройка перезапуска (при сбое)
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:17
+    container_name: my_postgres
+    restart: unless-stopped
+    # Переменные окружения для инициализации базы данных PostgreSQL
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: newpassword
+      POSTGRES_DB: your_db_name
+    # Сохранение данных на хост-машине
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  pgdata:

@@ -1,0 +1,35 @@
+plugins {
+    id 'java'
+    id 'war'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    compileOnly 'javax:javaee-api:8.0'
+
+    implementation 'org.primefaces:primefaces:8.0'
+
+    implementation 'org.eclipse.persistence:eclipselink:2.7.12'
+
+    implementation 'com.google.code.gson:gson:2.8.9'
+
+    implementation 'org.postgresql:postgresql:42.7.7'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+task copyDependencies(type: Copy) {
+    from configurations.runtimeClasspath
+    into "$buildDir/dependencies"
+}
