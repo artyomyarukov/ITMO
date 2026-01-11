@@ -1,0 +1,242 @@
+
+.main-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    min-height: 100vh;
+}
+
+
+.header-bar {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 15px 25px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.header-bar b {
+    color: #4A90E2;
+}
+
+.header-bar button {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.header-bar button:hover {
+    background: #c0392b;
+}
+
+.main-content {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    max-width: 1000px;
+}
+
+.graph-canvas {
+    background: #ffffff;
+    border: 2px solid #e0e0e0;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    cursor: crosshair;
+    border-radius: 8px;
+    transition: transform 0.2s;
+}
+
+.graph-canvas:hover {
+    border-color: #4A90E2;
+}
+
+
+.controls {
+    width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+.control-group label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #333;
+}
+
+
+.btn-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+}
+
+.btn-row button {
+    padding: 10px 5px;
+    border: 1px solid #4A90E2;
+    background: white;
+    color: #4A90E2;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-row button:hover {
+    background: #f0f7ff;
+}
+
+.btn-row button.active {
+    background: #4A90E2;
+    color: white;
+    box-shadow: 0 4px 10px rgba(74, 144, 226, 0.3);
+}
+
+/* Поле ввода Y */
+input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus {
+    border-color: #4A90E2;
+}
+
+/* Кнопка отправки */
+.send-btn {
+    padding: 15px;
+    background: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: background 0.3s;
+}
+
+.send-btn:hover {
+    background: #219150;
+    box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+}
+
+/* Таблица результатов */
+.history {
+    margin-top: 40px;
+    width: 100%;
+    max-width: 800px;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #4A90E2;
+    color: white;
+    padding: 15px;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+}
+
+td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+    color: #555;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+tr:hover {
+    background-color: #fcfcfc;
+}
+
+/* Стили для статуса попадания */
+.hit {
+    color: #27ae60;
+    font-weight: bold;
+}
+
+.miss {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+@media screen and (min-width: 1171px) {
+    .main-content {
+        flex-direction: row;
+        justify-content: space-around;
+        max-width: 1200px;
+    }
+}
+
+@media screen and (min-width: 689px) and (max-width: 1170px) {
+    .main-content {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+    .controls {
+        width: 100%;
+        max-width: 500px;
+    }
+}
+
+@media screen and (max-width: 688px) {
+    .main-page { padding: 10px; }
+    .header-bar {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    .main-content {
+        flex-direction: column;
+        align-items: center;
+    }
+    .graph-canvas {
+        width: 100% !important;
+        height: auto !important;
+        max-width: 320px;
+    }
+    .controls { width: 100%; }
+    .btn-row { grid-template-columns: repeat(3, 1fr); }
+    .history {
+        overflow-x: auto;
+        display: block;
+    }
+}

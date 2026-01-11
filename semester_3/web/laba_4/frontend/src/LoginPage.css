@@ -1,0 +1,24 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh; /* Чтобы форма была по центру экрана под шапкой */
+    padding: 20px;
+}
+
+.login-form {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px; /* Ограничение ширины для десктопа */
+}
+
+/* На мобилках форма будет растягиваться на весь экран */
+@media screen and (max-width: 688px) {
+    .login-form {
+        max-width: 100%;
+        box-shadow: none;
+    }
+}

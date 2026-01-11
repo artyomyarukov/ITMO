@@ -1,0 +1,45 @@
+### 1. Регистрация нового пользователя
+
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "tester_user",
+  "password": "securePassword123"
+}
+
+### 2. Логин (Получение JWT токена)
+
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "tester_user",
+  "password": "securePassword123"
+}
+
+> {%
+    // Скрипт сохраняет токен из ответа в глобальную переменную IDEA
+    client.global.set("auth_token", response.body.token);
+    client.log("Токен успешно получен и сохранен!");
+%}
+
+### 3. Отправка точки
+POST http://localhost:8080/api/points
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "x": 1.65,
+  "y": 0.5,
+  "r": 2.0,
+  "username": "tester_user"
+}
+
+### 4. Получение списка всех точек пользователя
+
+GET http://localhost:8080/api/points
+Authorization: Bearer {{auth_token}}
+
+### 5. Проверка доступа без токена
+GET http://localhost:8080/api/points
