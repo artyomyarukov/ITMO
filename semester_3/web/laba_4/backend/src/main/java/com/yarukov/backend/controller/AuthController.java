@@ -28,7 +28,6 @@ public class AuthController {
 
     @Autowired
     private MessageSource messageSource;
-
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody AuthRequest request) {
         boolean success = authService.register(request.getUsername(), request.getPassword());
