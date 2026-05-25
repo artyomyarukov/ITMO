@@ -30,7 +30,7 @@ public class PointService {
         return pointRepository.save(point);
     }
 
-    private boolean calculateHit(double x, double y, double r) {
+    public boolean calculateHit(double x, double y, double r) {
 
         if (x >= 0 && y >= 0 && x <= r / 2 && y <= r) return true;
 

@@ -6,7 +6,7 @@ import MainPage from './MainPage';
 import './App.css';
 
 function App() {
-    // Достаем состояние из Redux
+    //  состояние из Redux
     const isLoggedIn = useSelector(state => state.isLoggedIn);
     console.log("Текущий статус входа в App.js:", isLoggedIn)
     return (

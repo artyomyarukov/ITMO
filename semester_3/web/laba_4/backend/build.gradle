@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.yarukov'
-version = '0.0.1-SNAPSHOT'
+version = project.property('appVersion')
 description = 'backend'
 
 java {
@@ -13,6 +13,77 @@ java {
         languageVersion = JavaLanguageVersion.of(17)
     }
 }
+
+tasks.register('myCompile',JavaCompile){
+    group = 'OPI'
+    source = sourceSets.main.java
+    destinationDirectory = layout.buildDirectory.dir("classes/java/main")
+    classpath = sourceSets.main.compileClasspath
+    options.annotationProcessorPath = configurations.annotationProcessor
+    javaCompiler = javaToolchains.compilerFor(java.toolchain)
+
+}
+
+
+tasks.register('myBuild', Jar) {
+    group = 'OPI'
+    description = 'Упаковка проекта в исполняемый JAR архив'
+    dependsOn 'myCompile'
+    manifest {
+        attributes(
+                'Implementation-Title': 'Backend Lab 4',
+                'Implementation-Version': project.property('appVersion'),
+                'Main-Class': 'org.springframework.boot.loader.launch.JarLauncher',
+                'Start-Class': project.property('mainClass')
+        )
+    }
+    from tasks.named('myCompile').get().destinationDirectory
+    from sourceSets.main.resources
+    archiveFileName = "lab4-backend.jar"
+    destinationDirectory = layout.buildDirectory.dir("libs")
+
+
+}
+
+
+tasks.register('myClean'){
+    group =  'OPI'
+    doLast{
+        def buildDir = file('build')
+        if (buildDir.exists()){
+            buildDir.deleteDir()
+        }
+        else{
+            println "Папка сборки не найдена"
+        }
+    }
+}
+
+tasks.register('myTest',JavaExec){
+    group = 'OPI'
+    dependsOn 'myCompile', 'compileTestJava'
+    mainClass = 'org.junit.platform.console.ConsoleLauncher'
+    classpath = sourceSets.test.runtimeClasspath
+    jvmArgs("-Dfile.encoding=UTF-8")
+    args = [
+            '--scan-classpath',
+            '--reports-dir', layout.buildDirectory.dir("test-results/myTest").get().asFile.path,
+            '--fail-if-no-tests',
+            '--details=flat'
+    ]
+
+}
+
+tasks.named('compileTestJava') {
+    dependsOn 'myCompile'
+}
+
+
+
+
+
+
+
 
 repositories {
     mavenCentral()
@@ -30,24 +101,20 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-validation-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-    compileOnly 'org.projectlombok:lombok:1.18.28'
-    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+    compileOnly 'org.projectlombok:lombok:1.18.34'
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-
-
-
     testCompileOnly 'org.projectlombok:lombok:1.18.28'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
-
-
-
+    testImplementation 'org.junit.platform:junit-platform-console-standalone:1.10.2'
 
 }
 
 tasks.named('test') {
+
     useJUnitPlatform()
+
 }
