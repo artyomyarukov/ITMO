@@ -74,6 +74,65 @@ tasks.register('myTest',JavaExec){
 
 }
 
+
+tasks.register('native2ascii') {
+    group = 'OPI'
+    doLast {
+        ant.native2ascii(
+                src: 'src/main/resources',
+                dest: layout.buildDirectory.dir("resources/main").get().asFile,
+
+                includes: '**/*.properties.src',
+                ext: '.properties',
+                encoding: 'UTF-8'
+        )
+    }
+}
+
+
+tasks.register('diff') {
+    group = 'OPI'
+    doLast {
+
+        def classesToWatch = project.property('watchedClasses').split(',')
+        def gitStatus = "git status --porcelain".execute().text
+        def changedWatchedFiles = []
+        gitStatus.eachLine { line ->
+            classesToWatch.each { className ->
+                if (line.contains(className.trim())) {
+                    changedWatchedFiles.add(className.trim())
+                }
+            }
+        }
+
+        if (!changedWatchedFiles.isEmpty()) {
+            println "Changess in ${changedWatchedFiles}"
+
+
+            changedWatchedFiles.each { file -> "git add ${file}".execute().waitFor() }
+            def msg = project.property('diffMessage')
+            "git commit -m \"${msg}\"".execute().waitFor()
+            println "Sucess commit"
+        } else {
+            println "No changes"
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 tasks.named('compileTestJava') {
     dependsOn 'myCompile'
 }
