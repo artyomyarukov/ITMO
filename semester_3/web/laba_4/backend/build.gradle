@@ -29,6 +29,7 @@ tasks.register('myBuild', Jar) {
     group = 'OPI'
     description = 'Упаковка проекта в исполняемый JAR архив'
     dependsOn 'myCompile'
+    dependsOn 'compileJava'
     manifest {
         attributes(
                 'Implementation-Title': 'Backend Lab 4',
@@ -61,7 +62,7 @@ tasks.register('myClean'){
 
 tasks.register('myTest',JavaExec){
     group = 'OPI'
-    dependsOn 'myCompile', 'compileTestJava'
+    dependsOn 'myBuild', 'compileTestJava'
     mainClass = 'org.junit.platform.console.ConsoleLauncher'
     classpath = sourceSets.test.runtimeClasspath
     jvmArgs("-Dfile.encoding=UTF-8")
@@ -173,7 +174,7 @@ dependencies {
 }
 
 tasks.named('test') {
-
+    depensOn 'myBuild'
     useJUnitPlatform()
 
 }

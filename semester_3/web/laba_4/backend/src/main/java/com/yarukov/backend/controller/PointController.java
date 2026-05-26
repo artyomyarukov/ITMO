@@ -29,8 +29,8 @@ public class PointController {
     @Autowired
     private AuthService authService;
 
-    @Autowired private
-    PointRepository pointRepository;
+    @Autowired
+    private PointRepository pointRepository;
 
     @PostMapping
     public ResponseEntity<Point> addPoint(@Valid @RequestBody PointRequest request) {
