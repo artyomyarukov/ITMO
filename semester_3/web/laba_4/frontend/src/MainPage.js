@@ -75,7 +75,7 @@ const MainPage = () => {
         ctx.fill();
 
 
-        // 2. Оси
+        //  Оси
 
         ctx.strokeStyle = '#333';
         ctx.lineWidth = 1;
@@ -99,7 +99,7 @@ const MainPage = () => {
         ctx.stroke();
 
 
-        // 3. Стрелки и разметка
+        //  Стрелки и разметка
         ctx.font = 'bold 12px Arial';
         ctx.fillStyle = 'black';
         ctx.fillText('Y', centerX - 20, 15);
@@ -119,7 +119,7 @@ const MainPage = () => {
             ctx.fillText(i, centerX + 10, yPos + 4);
         }
 
-        // 4. Точки
+        //  Точки
         results
             .filter(p => Number(p.r) === Number(rValue))
             .forEach(p => {
@@ -160,7 +160,7 @@ const MainPage = () => {
             x: Number(xVal),
             y: Number(yVal),
             r: Number(rVal),
-            username: savedUsername // Отправляем, что достали
+            username: savedUsername // отправляем, что достали
         };
 
         console.log("Пытаемся отправить данные:", pointData);

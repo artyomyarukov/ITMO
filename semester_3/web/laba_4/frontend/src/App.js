@@ -13,7 +13,7 @@ function App() {
         <div className="App">
             <Header />
             <main>
-                {/* Если залогинен — показываем MainPage, если нет — LoginPage */}
+                {/* Если залогинен - показываем MainPage, если нет - LoginPage */}
                 {isLoggedIn ? <MainPage /> : <LoginPage />}
             </main>
         </div>
