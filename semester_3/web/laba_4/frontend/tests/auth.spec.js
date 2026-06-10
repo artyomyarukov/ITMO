@@ -2,6 +2,7 @@ const {test, expect} = require('@playwright/test')
 
 test.describe('Тестирование страниц авторизации', () => {
         test.beforeEach(async ({page}) => {
+            page.setDefaultNavigationTimeout(60000);
             await page.goto('http://localhost:3000');
         })
 
@@ -49,6 +50,16 @@ test.describe('Тестирование страниц авторизации', 
         await page.locator('input[type="password"]').fill('password123');
         await page.locator('button.auth-button').click();
         await expect(page.locator('h2')).toHaveText('Авторизация',{ timeout: 10000 });
+    });
+
+    test('tc-05: Вход и выход из системы', async ({ page }) => {
+        await page.locator('input[type="text"]').fill('testuser');
+        await page.locator('input[type="password"]').fill('password123');
+        await page.locator('button.auth-button').click();
+        const canvas = page.locator('canvas.graph-canvas');
+        await expect(canvas).toBeVisible({ timeout: 10000 });
+        await page.locator('button:has-text("Выход")').click();
+        await expect(page.locator('h2')).toHaveText('Авторизация');
     });
 
 

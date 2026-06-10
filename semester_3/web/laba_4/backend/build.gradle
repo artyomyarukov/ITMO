@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '4.0.1'
+    id 'org.springframework.boot' version '3.4.1'
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
@@ -24,24 +24,18 @@ tasks.register('myCompile',JavaCompile){
 
 }
 
+bootJar {
+    dependsOn 'myCompile'
+    archiveFileName = "lab4-backend.jar"
+    destinationDirectory = layout.buildDirectory.dir("libs")
+}
 
-tasks.register('myBuild', Jar) {
+
+tasks.register('myBuild') {
     group = 'OPI'
     description = 'Упаковка проекта в исполняемый JAR архив'
     dependsOn 'myCompile'
-    dependsOn 'compileJava'
-    manifest {
-        attributes(
-                'Implementation-Title': 'Backend Lab 4',
-                'Implementation-Version': project.property('appVersion'),
-                'Main-Class': 'org.springframework.boot.loader.launch.JarLauncher',
-                'Start-Class': project.property('mainClass')
-        )
-    }
-    from tasks.named('myCompile').get().destinationDirectory
-    from sourceSets.main.resources
-    archiveFileName = "lab4-backend.jar"
-    destinationDirectory = layout.buildDirectory.dir("libs")
+    dependsOn 'bootJar'
 
 
 }
@@ -172,27 +166,28 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-jooq'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     runtimeOnly 'org.postgresql:postgresql'
-    testImplementation 'org.springframework.boot:spring-boot-starter-jooq-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-security-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-validation-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     compileOnly 'org.projectlombok:lombok:1.18.34'
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    testCompileOnly 'org.projectlombok:lombok:1.18.28'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.junit.platform:junit-platform-console-standalone:1.10.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testCompileOnly 'org.projectlombok:lombok:1.18.34'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+}
 
+
+tasks.named('resolveMainClassName') {
+    dependsOn 'myCompile'
 }
 
 tasks.named('test') {
-    depensOn 'myBuild'
+    dependsOn 'myBuild'
     useJUnitPlatform()
 
 }
