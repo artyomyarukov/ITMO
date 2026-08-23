@@ -99,7 +99,7 @@ const MainPage = () => {
         ctx.stroke();
 
 
-        //  Стрелки и разметка
+        //  стрелки и разметка
         ctx.font = 'bold 12px Arial';
         ctx.fillStyle = 'black';
         ctx.fillText('Y', centerX - 20, 15);
@@ -119,7 +119,7 @@ const MainPage = () => {
             ctx.fillText(i, centerX + 10, yPos + 4);
         }
 
-        //  Точки
+        //  точки
         results
             .filter(p => Number(p.r) === Number(rValue))
             .forEach(p => {
@@ -296,7 +296,7 @@ const MainPage = () => {
                             <td>{Number(res.y).toFixed(5)}</td>
                             <td>{res.r}</td>
                             <td>{formatTime(res.executionTime)}</td>
-                            {/* Новая ячейка */}
+                            {/* новая ячейка */}
                             <td className={res.hit ? 'hit' : 'miss'}>
                                 {res.hit ? 'Попал' : 'Мимо'}
                             </td>

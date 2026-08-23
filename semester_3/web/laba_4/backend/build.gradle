@@ -88,7 +88,6 @@ tasks.register('native2ascii') {
 tasks.register('diff') {
     group = 'OPI'
     doLast {
-
         def classesToWatch = project.property('watchedClasses').split(',')
         def gitStatus = "git status --porcelain".execute().text
         def changedWatchedFiles = []
@@ -99,11 +98,8 @@ tasks.register('diff') {
                 }
             }
         }
-
         if (!changedWatchedFiles.isEmpty()) {
             println "Changess in ${changedWatchedFiles}"
-
-
             changedWatchedFiles.each { file -> "git add ${file}".execute().waitFor() }
             def msg = project.property('diffMessage')
             "git commit -m \"${msg}\"".execute().waitFor()
@@ -128,11 +124,7 @@ tasks.register('functionalTest', Exec) {
     } else {
         commandLine 'npx', 'playwright', 'test', '--workers=1'
     }
-
-
 }
-
-
 
 
 
