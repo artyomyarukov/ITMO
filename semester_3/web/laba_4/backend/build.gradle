@@ -1,11 +1,11 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '4.0.1'
+    id 'org.springframework.boot' version '3.4.1'
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'com.yarukov'
-version = '0.0.1-SNAPSHOT'
+version = project.property('appVersion')
 description = 'backend'
 
 java {
@@ -13,6 +13,141 @@ java {
         languageVersion = JavaLanguageVersion.of(17)
     }
 }
+
+tasks.register('myCompile',JavaCompile){
+    group = 'OPI'
+    source = sourceSets.main.java
+    destinationDirectory = layout.buildDirectory.dir("classes/java/main")
+    classpath = sourceSets.main.compileClasspath
+    options.annotationProcessorPath = configurations.annotationProcessor
+    javaCompiler = javaToolchains.compilerFor(java.toolchain)
+
+}
+
+bootJar {
+    dependsOn 'myCompile'
+    archiveFileName = "lab4-backend.jar"
+    destinationDirectory = layout.buildDirectory.dir("libs")
+}
+
+
+tasks.register('myBuild') {
+    group = 'OPI'
+    description = 'Упаковка проекта в исполняемый JAR архив'
+    dependsOn 'myCompile'
+    dependsOn 'bootJar'
+
+
+}
+
+
+tasks.register('myClean'){
+    group =  'OPI'
+    doLast{
+        def buildDir = file('build')
+        if (buildDir.exists()){
+            buildDir.deleteDir()
+        }
+        else{
+            println "Папка сборки не найдена"
+        }
+    }
+}
+
+tasks.register('myTest',JavaExec){
+    group = 'OPI'
+    dependsOn 'myBuild', 'compileTestJava'
+    mainClass = 'org.junit.platform.console.ConsoleLauncher'
+    classpath = sourceSets.test.runtimeClasspath
+    jvmArgs("-Dfile.encoding=UTF-8")
+    args = [
+            '--scan-classpath',
+            '--reports-dir', layout.buildDirectory.dir("test-results/myTest").get().asFile.path,
+            '--fail-if-no-tests',
+            '--details=flat'
+    ]
+
+}
+
+
+tasks.register('native2ascii') {
+    group = 'OPI'
+    doLast {
+        ant.native2ascii(
+                src: 'src/main/resources',
+               // dest: layout.buildDirectory.dir("resources/main").get().asFile,
+                dest:'src/main/resources',
+                includes: '**/*.src',
+                ext: '.properties',
+                encoding: 'UTF-8'
+        )
+    }
+}
+
+
+tasks.register('diff') {
+    group = 'OPI'
+    doLast {
+        def classesToWatch = project.property('watchedClasses').split(',')
+        def gitStatus = "git status --porcelain".execute().text
+        def changedWatchedFiles = []
+        gitStatus.eachLine { line ->
+            classesToWatch.each { className ->
+                if (line.contains(className.trim())) {
+                    changedWatchedFiles.add(className.trim())
+                }
+            }
+        }
+        if (!changedWatchedFiles.isEmpty()) {
+            println "Changess in ${changedWatchedFiles}"
+            changedWatchedFiles.each { file -> "git add ${file}".execute().waitFor() }
+            def msg = project.property('diffMessage')
+            "git commit -m \"${msg}\"".execute().waitFor()
+            println "Sucess commit"
+        } else {
+            println "No changes"
+        }
+    }
+}
+
+
+
+
+tasks.register('functionalTest', Exec) {
+    group = 'OPI'
+
+    dependsOn 'myBuild'
+    workingDir '../frontend'
+
+    if (System.getProperty('os.name').toLowerCase().contains('windows')) {
+        commandLine 'cmd', '/c', 'npx playwright test --workers=1'
+    } else {
+        commandLine 'npx', 'playwright', 'test', '--workers=1'
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+tasks.named('compileTestJava') {
+    dependsOn 'myCompile'
+}
+
+
+
+
+
+
+
 
 repositories {
     mavenCentral()
@@ -23,31 +158,28 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-jooq'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     runtimeOnly 'org.postgresql:postgresql'
-    testImplementation 'org.springframework.boot:spring-boot-starter-jooq-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-security-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-validation-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-    compileOnly 'org.projectlombok:lombok:1.18.28'
-    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+    compileOnly 'org.projectlombok:lombok:1.18.34'
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.junit.platform:junit-platform-console-standalone:1.10.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testCompileOnly 'org.projectlombok:lombok:1.18.34'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+}
 
 
-
-    testCompileOnly 'org.projectlombok:lombok:1.18.28'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
-
-
-
-
+tasks.named('resolveMainClassName') {
+    dependsOn 'myCompile'
 }
 
 tasks.named('test') {
+    dependsOn 'myBuild'
     useJUnitPlatform()
+
 }

@@ -1,0 +1,49 @@
+services:
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: lab4-postgres
+    environment:
+      POSTGRES_DB: laba_4
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - lab4-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: lab4-backend
+    ports:
+      - "8080:8080"
+    environment:
+        SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/laba_4
+        SPRING_DATASOURCE_USERNAME: postgres
+        SPRING_DATASOURCE_PASSWORD: password
+    depends_on:
+        - postgres-db
+    networks:
+        - lab4-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: lab4-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - lab4-network
+
+networks:
+  lab4-network:
+    driver: bridge
+
+volumes:
+  pgdata:

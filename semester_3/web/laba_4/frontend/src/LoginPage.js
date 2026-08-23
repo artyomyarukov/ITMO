@@ -15,7 +15,7 @@ const LoginPage = () => {
             const response = await fetch('http://localhost:8080/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password }) // Поля должны совпадать с AuthRequest в Java
+                body: JSON.stringify({ username, password }) // поля должны совпадать с AuthRequest в Java
             });
 
             if (response.ok) {
@@ -25,7 +25,7 @@ const LoginPage = () => {
 
                 localStorage.setItem('token', data.token);
 
-                // Отправляем в Redux
+                // отправляем в Redux
                 dispatch({ type: 'LOGIN', payload: username });
             } else {
                 const errorData = await response.json();
