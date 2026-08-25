@@ -34,20 +34,20 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                // делаем сессии Stateless из-за JWT
+                // делаем сессии stateless
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // Вход и регистрация открыты
+                        .requestMatchers("/api/auth/**").permitAll() // вход и регистрация открыты
                         .requestMatchers("/api/points/**").authenticated()
-                        .anyRequest().authenticated() // Всё остальное защищено
+                        .anyRequest().authenticated() // всё остальное защищено
                 )
 
-                // Отключаем стандартные формы входа
+                // отключаем стандартные формы входа
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
 
-                // Добавляем JWT фильтр перед стандартным фильтром аутентификации
+                // добавляем JWT фильтр перед стандартным фильтром аутентификации
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

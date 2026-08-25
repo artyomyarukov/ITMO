@@ -7,7 +7,6 @@ import com.yarukov.backend.repository.PointRepository;
 import com.yarukov.backend.service.AuthService;
 import com.yarukov.backend.service.PointService;
 import jakarta.validation.Valid;
-import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,8 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static org.jooq.impl.DSL.field;
-import static org.jooq.impl.DSL.table;
+
 
 @RestController
 @RequestMapping("/api/points")
