@@ -1,3 +1,5 @@
+
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.1'
@@ -42,9 +44,58 @@ dependencies {
 
 }
 
+tasks.register('myCompile',JavaCompile){
+    group = 'opi'
+    description = 'compilation'
+    source = fileTree('src/main/java')
+    destinationDirectory = file('build/classes/java/main')
+    classpath = configurations.compileClasspath
+    options.encoding = 'UTF-8'
+    options.annotationProcessorPath = configurations.annotationProcessor
+}
+
+
+
+tasks.named('bootJar') {
+    archiveBaseName = project.property('appArchiveName')
+    archiveVersion = project.property('appVersion')
+
+    classpath = files(tasks.named('myCompile'), configurations.runtimeClasspath)
+
+    from('src/main/resources') {
+        into('BOOT-INF/classes')
+    }
+
+    manifest {
+        attributes(
+                'Start-Class': project.property('mainClass'),
+                'Implementation-Version': project.property('appVersion')
+        )
+    }
+}
+
+
+
+tasks.register('myBuild'){
+    group = 'opi'
+    description = 'build'
+    inputs.files(tasks.named('bootJar'))
+    outputs.files(tasks.named('bootJar'))
+}
+
+
+
+
+
+
+
+
+
+
 
 tasks.register('myClean'){
-    group = 'OPI'
+    group = 'opi'
+    description = 'clean'
     doLast{
         def buildDir = file('build')
         if(buildDir.exists()){
@@ -53,13 +104,7 @@ tasks.register('myClean'){
         else{
             println "not found buld dir"
         }
-
-
     }
-
-
-
-
 }
 
 
