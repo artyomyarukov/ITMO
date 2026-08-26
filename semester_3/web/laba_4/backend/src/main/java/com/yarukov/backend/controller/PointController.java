@@ -8,13 +8,13 @@ import com.yarukov.backend.service.AuthService;
 import com.yarukov.backend.service.PointService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-
+import org.springframework.context.i18n.LocaleContextHolder;
 
 @RestController
 @RequestMapping("/api/points")
@@ -27,8 +27,12 @@ public class PointController {
     @Autowired
     private AuthService authService;
 
-    @Autowired private
+    @Autowired
+    private
     PointRepository pointRepository;
+
+    @Autowired
+    private MessageSource messageSource;
 
     @PostMapping
     public ResponseEntity<Point> addPoint(@Valid @RequestBody PointRequest request) {
@@ -45,6 +49,14 @@ public class PointController {
     private User getCurrentUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return authService.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("юзера нет((("));
-    }
+                .orElseThrow(() ->
+                        {
+                            String msg = messageSource.getMessage(
+                                    "user.not.found",
+                                    null,
+                                    LocaleContextHolder.getLocale()
+                            );
+                            return new RuntimeException(msg);
+                        });
+        }
 }
