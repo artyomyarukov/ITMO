@@ -1,5 +1,3 @@
-
-
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.1'
@@ -19,9 +17,6 @@ java {
 repositories {
     mavenCentral()
 }
-
-
-
 
 
 dependencies {
@@ -44,7 +39,7 @@ dependencies {
 
 }
 
-tasks.register('myCompile',JavaCompile){
+tasks.register('myCompile', JavaCompile) {
     group = 'opi'
     description = 'compilation'
     source = fileTree('src/main/java')
@@ -53,7 +48,6 @@ tasks.register('myCompile',JavaCompile){
     options.encoding = 'UTF-8'
     options.annotationProcessorPath = configurations.annotationProcessor
 }
-
 
 
 tasks.named('bootJar') {
@@ -75,8 +69,7 @@ tasks.named('bootJar') {
 }
 
 
-
-tasks.register('myBuild'){
+tasks.register('myBuild') {
     group = 'opi'
     description = 'build'
     inputs.files(tasks.named('bootJar'))
@@ -84,32 +77,87 @@ tasks.register('myBuild'){
 }
 
 
-
-
-
-
-
-
-
-
-
-tasks.register('myClean'){
+tasks.register('myClean') {
     group = 'opi'
     description = 'clean'
-    doLast{
+    doLast {
         def buildDir = file('build')
-        if(buildDir.exists()){
+        if (buildDir.exists()) {
             buildDir.deleteDir()
-        }
-        else{
+        } else {
             println "not found buld dir"
         }
     }
 }
 
 
+tasks.register("native2ascii") {
+    group = 'opi'
+    description = 'convertion to ascii'
+    def srcDir = file(providers.gradleProperty('localizationSrcDir').getOrElse('src/main/resources/localization'))
+    inputs.dir(srcDir)
+    def outDir = file(providers.gradleProperty('localizationOutDir').getOrElse('build/generated-resources/ascii-locales'))
+    outputs.dir(outDir)
+    doLast {
+        inputs.files.each { File inputFile ->
+            def outputFile = new File(outDir, srcDir.toPath().relativize(inputFile.toPath()).toString())
+            outputFile.parentFile.mkdirs()
+
+            def convertedContent = inputFile.getText('UTF-8').toCharArray().collect { char c ->
+                (c > 127) ? String.format("\\u%04x", (c as int)) : c
+            }.join("")
+            outputFile.write(convertedContent, "ISO-8859-1")
+        }
+    }
+}
 
 
+tasks.register("diff") {
+    group = 'opi'
+    description = "check and copy classes in properties"
+    doLast {
+        def workingDir = project.projectDir
+
+
+        def repoRoot = "git rev-parse --show-toplevel".execute(null, workingDir).text.trim()
+        def currentDir = workingDir.absolutePath.replace("\\", "/")
+        def prefix = currentDir.replace(repoRoot.replace("\\", "/"), "").replaceFirst("^/", "") + "/"
+
+        def gitNeedComm = project.property("diffClasses").split(",")
+        def gitStatus = "git status --porcelain".execute().text
+        def changedFiles = []
+        gitStatus.eachLine {
+            line ->
+                if (line.contains('backend')) {
+                    def lineStr = line.split('/')
+                    def lineSubstr = line.substring(3)
+                    def lastPathToFIle = lineStr[-1]
+                    if (gitNeedComm.contains(lastPathToFIle)) {
+                        changedFiles.add(lineSubstr.replace(prefix, ""))
+                    }
+                }
+        }
+        println changedFiles
+        if (!changedFiles.isEmpty()) {
+
+            changedFiles.each { file -> "git add ${file}".execute(null, workingDir).waitFor() }
+            def msg = project.property('diffCommitMessage')
+            def commitProcess = "git commit -m \"${msg}\"".execute(null, workingDir)
+            commitProcess.waitFor()
+            if (commitProcess.exitValue() == 0) {
+                println "Success commit"
+            } else {
+                def errorText = commitProcess.err.text
+                print errorText
+            }
+        } else {
+            println "No changes"
+        }
+
+    }
+
+
+}
 
 
 tasks.named('test') {
