@@ -8,11 +8,15 @@ group = 'com.yarukov'
 version = property('appVersion')
 description = 'backend'
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.annotationProcessorPath = configurations.annotationProcessor
 }
+
+
+
+
+
 
 repositories {
     mavenCentral()
@@ -117,8 +121,6 @@ tasks.register("diff") {
     description = "check and copy classes in properties"
     doLast {
         def workingDir = project.projectDir
-
-
         def repoRoot = "git rev-parse --show-toplevel".execute(null, workingDir).text.trim()
         def currentDir = workingDir.absolutePath.replace("\\", "/")
         def prefix = currentDir.replace(repoRoot.replace("\\", "/"), "").replaceFirst("^/", "") + "/"
@@ -153,18 +155,20 @@ tasks.register("diff") {
         } else {
             println "No changes"
         }
-
     }
-
-
 }
+
+
 
 
 tasks.named('test') {
     useJUnitPlatform()
-
+    jvmArgs '-XX:+EnableDynamicAgentLoading'
+    testLogging {
+        events "passed", "skipped", "failed"
+        showStandardStreams = true
+    }
 }
-
 
 
 

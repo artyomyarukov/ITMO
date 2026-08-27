@@ -8,11 +8,11 @@ const AuthPage = () => {
     const [password, setPassword] = useState('');
     const dispatch = useDispatch();
 
-    // Очищаем поля при переключении между входом и регистрацией
+    // очищаем поля при переключении между входом и регистрацией
     useEffect(() => {
         setUsername('');
         setPassword('');
-    }, [isLoginView]);
+    }, [isLoginView]);2
 
     const handleSubmit = async (e) => {
         e.preventDefault();

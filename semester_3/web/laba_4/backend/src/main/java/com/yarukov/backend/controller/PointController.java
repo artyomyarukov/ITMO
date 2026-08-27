@@ -28,8 +28,7 @@ public class PointController {
     private AuthService authService;
 
     @Autowired
-    private
-    PointRepository pointRepository;
+    private PointRepository pointRepository;
 
     @Autowired
     private MessageSource messageSource;
