@@ -4,8 +4,9 @@ import com.yarukov.backend.dto.PointRequest;
 import com.yarukov.backend.model.Point;
 import com.yarukov.backend.model.User;
 import com.yarukov.backend.repository.PointRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+
 
 
 import java.time.LocalDateTime;
