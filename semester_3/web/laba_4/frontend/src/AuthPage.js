@@ -8,7 +8,7 @@ const AuthPage = () => {
     const [password, setPassword] = useState('');
     const dispatch = useDispatch();
 
-    // Очищаем поля при переключении между входом и регистрацией
+    // очищаем поля при переключении между входом и регистрацией
     useEffect(() => {
         setUsername('');
         setPassword('');
@@ -38,7 +38,7 @@ const AuthPage = () => {
                 }
             } else {
 
-                alert(data.message || "Ошибка аутентификации");
+                alert(data.error || data.message || "Ошибка аутентификации");
             }
         } catch (error) {
             alert("Нет связи с бэкендом");

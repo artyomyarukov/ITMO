@@ -1,53 +1,209 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '4.0.1'
+    id 'org.springframework.boot' version '3.4.1'
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'com.yarukov'
-version = '0.0.1-SNAPSHOT'
+version = property('appVersion')
 description = 'backend'
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.annotationProcessorPath = configurations.annotationProcessor
+}
+
+
+sourceSets {
+    functionalTest {
+        java.srcDir 'src/functionalTest/java'
     }
 }
+
+configurations {
+    functionalTestImplementation.extendsFrom testImplementation
+    functionalTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+
+
 
 repositories {
     mavenCentral()
 }
+
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-jooq'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     runtimeOnly 'org.postgresql:postgresql'
-    testImplementation 'org.springframework.boot:spring-boot-starter-jooq-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-security-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-validation-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-    compileOnly 'org.projectlombok:lombok:1.18.28'
-    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+    compileOnly 'org.projectlombok:lombok:1.18.34'
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-
-
-
-    testCompileOnly 'org.projectlombok:lombok:1.18.28'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
-
-
-
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testCompileOnly 'org.projectlombok:lombok:1.18.34'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+    testImplementation 'com.microsoft.playwright:playwright:1.49.0'
 
 }
 
-tasks.named('test') {
+tasks.register('myCompile', JavaCompile) {
+    group = 'opi'
+    description = 'compilation'
+    source = fileTree('src/main/java')
+    destinationDirectory = file('build/classes/java/main')
+    classpath = configurations.compileClasspath
+    options.encoding = 'UTF-8'
+    options.annotationProcessorPath = configurations.annotationProcessor
+}
+
+
+tasks.named('bootJar') {
+    archiveBaseName = project.property('appArchiveName')
+    archiveVersion = project.property('appVersion')
+
+    classpath = files(tasks.named('myCompile'), configurations.runtimeClasspath)
+
+    from('src/main/resources') {
+        into('BOOT-INF/classes')
+    }
+
+    manifest {
+        attributes(
+                'Start-Class': project.property('mainClass'),
+                'Implementation-Version': project.property('appVersion')
+        )
+    }
+}
+
+
+tasks.register('myBuild') {
+    group = 'opi'
+    description = 'build'
+    inputs.files(tasks.named('bootJar'))
+    outputs.files(tasks.named('bootJar'))
+}
+
+
+tasks.register('myClean') {
+    group = 'opi'
+    description = 'clean'
+    doLast {
+        def buildDir = file('build')
+        if (buildDir.exists()) {
+            buildDir.deleteDir()
+        } else {
+            println "not found buld dir"
+        }
+    }
+}
+
+
+tasks.register("native2ascii") {
+    group = 'opi'
+    description = 'convertion to ascii'
+    def srcDir = file(providers.gradleProperty('localizationSrcDir').getOrElse('src/main/resources/localization'))
+    inputs.dir(srcDir)
+    def outDir = file(providers.gradleProperty('localizationOutDir').getOrElse('build/generated-resources/ascii-locales'))
+    outputs.dir(outDir)
+    doLast {
+        inputs.files.each { File inputFile ->
+            def outputFile = new File(outDir, srcDir.toPath().relativize(inputFile.toPath()).toString())
+            outputFile.parentFile.mkdirs()
+
+            def convertedContent = inputFile.getText('UTF-8').toCharArray().collect { char c ->
+                (c > 127) ? String.format("\\u%04x", (c as int)) : c
+            }.join("")
+            outputFile.write(convertedContent, "ISO-8859-1")
+        }
+    }
+}
+
+
+tasks.register("diff") {
+    group = 'opi'
+    description = "check and copy classes in properties"
+    doLast {
+        def workingDir = project.projectDir
+        def repoRoot = "git rev-parse --show-toplevel".execute(null, workingDir).text.trim()
+        def currentDir = workingDir.absolutePath.replace("\\", "/")
+        def prefix = currentDir.replace(repoRoot.replace("\\", "/"), "").replaceFirst("^/", "") + "/"
+
+        def gitNeedComm = project.property("diffClasses").split(",")
+        def gitStatus = "git status --porcelain".execute().text
+        def changedFiles = []
+        gitStatus.eachLine {
+            line ->
+                if (line.contains('backend')) {
+                    def lineStr = line.split('/')
+                    def lineSubstr = line.substring(3)
+                    def lastPathToFIle = lineStr[-1]
+                    if (gitNeedComm.contains(lastPathToFIle)) {
+                        changedFiles.add(lineSubstr.replace(prefix, ""))
+                    }
+                }
+        }
+        println changedFiles
+        if (!changedFiles.isEmpty()) {
+
+            changedFiles.each { file -> "git add ${file}".execute(null, workingDir).waitFor() }
+            def msg = project.property('diffCommitMessage')
+            def commitProcess = "git commit -m \"${msg}\"".execute(null, workingDir)
+            commitProcess.waitFor()
+            if (commitProcess.exitValue() == 0) {
+                println "Success commit"
+            } else {
+                def errorText = commitProcess.err.text
+                print errorText
+            }
+        } else {
+            println "No changes"
+        }
+    }
+}
+
+
+
+
+tasks.register('myTest',Test) {
+    group = 'opi'
+    description = 'unit-test'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
     useJUnitPlatform()
+    jvmArgs '-XX:+EnableDynamicAgentLoading'
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }
+
+
+
+tasks.register('functionalTest', Test) {
+    group = 'opi'
+    description = 'functional tests'
+
+    testClassesDirs = sourceSets.functionalTest.output.classesDirs
+    classpath = sourceSets.functionalTest.runtimeClasspath
+
+    useJUnitPlatform()
+    jvmArgs '-XX:+EnableDynamicAgentLoading','-Dfile.encoding=UTF-8', '-Dsun.stdout.encoding=UTF-8'
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        showStandardStreams = true
+    }
+}
+
+
+
+
+
+

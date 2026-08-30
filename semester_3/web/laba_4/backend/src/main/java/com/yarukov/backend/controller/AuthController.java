@@ -8,15 +8,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 import java.util.Optional;
+import java.util.Map;
+
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+
 
 @RestController
 @RequestMapping("/api/auth")
 
 @CrossOrigin(origins = "http://localhost:3000")
 public class AuthController {
+
+
+    @Autowired
+    private MessageSource messageSource;
+
+
+
 
     @Autowired
     private AuthService authService;
@@ -28,11 +38,24 @@ public class AuthController {
     public ResponseEntity<?> register(@RequestBody AuthRequest request) {
         boolean success = authService.register(request.getUsername(), request.getPassword());
         if (success) {
+            String msg = messageSource.getMessage(
+                    "register.success",
+                    null,
+                    LocaleContextHolder.getLocale()
+            );
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(Map.of("message", "Пользователь успешно зарегистрирован"));
+                    .body(Map.of("message", msg));
         }
+
+        String errorMsg = messageSource.getMessage(
+                "register.error.username.exists",
+                null,
+                LocaleContextHolder.getLocale()
+        );
+
+
         return ResponseEntity.badRequest()
-                .body(Map.of("error", "Имя пользователя уже занято"));
+                .body(Map.of("error", errorMsg));
     }
 
     @PostMapping("/login")
@@ -47,7 +70,13 @@ public class AuthController {
             ));
         }
 
+        String errorMsg = messageSource.getMessage(
+                "login.error.credentials",
+                null,
+                LocaleContextHolder.getLocale()
+        );
+
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(Map.of("error", "Неверное имя пользователя или пароль"));
+                .body(Map.of("error", errorMsg));
     }
 }
