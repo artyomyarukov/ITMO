@@ -196,6 +196,8 @@ tasks.register('functionalTest', Test) {
     useJUnitPlatform()
     jvmArgs '-XX:+EnableDynamicAgentLoading','-Dfile.encoding=UTF-8', '-Dsun.stdout.encoding=UTF-8'
 
+    outputs.upToDateWhen { false }
+
     testLogging {
         events "passed", "skipped", "failed"
         showStandardStreams = true
