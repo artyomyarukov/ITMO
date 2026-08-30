@@ -42,6 +42,7 @@ public class AuthServiceTest {
     }
 
     @Test
+
     void testSuccesRegister(){
         when(userRepository.existsByUsername(username)).thenReturn(false);
         when(passwordEncoder.encode(password)).thenReturn(encodedPassword);

@@ -14,6 +14,16 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 
+sourceSets {
+    functionalTest {
+        java.srcDir 'src/functionalTest/java'
+    }
+}
+
+configurations {
+    functionalTestImplementation.extendsFrom testImplementation
+    functionalTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
 
 
 
@@ -40,6 +50,7 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testCompileOnly 'org.projectlombok:lombok:1.18.34'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+    testImplementation 'com.microsoft.playwright:playwright:1.49.0'
 
 }
 
@@ -161,9 +172,30 @@ tasks.register("diff") {
 
 
 
-tasks.named('test') {
+tasks.register('myTest',Test) {
+    group = 'opi'
+    description = 'unit-test'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
     useJUnitPlatform()
     jvmArgs '-XX:+EnableDynamicAgentLoading'
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
+
+
+tasks.register('functionalTest', Test) {
+    group = 'opi'
+    description = 'functional tests'
+
+    testClassesDirs = sourceSets.functionalTest.output.classesDirs
+    classpath = sourceSets.functionalTest.runtimeClasspath
+
+    useJUnitPlatform()
+    jvmArgs '-XX:+EnableDynamicAgentLoading','-Dfile.encoding=UTF-8', '-Dsun.stdout.encoding=UTF-8'
+
     testLogging {
         events "passed", "skipped", "failed"
         showStandardStreams = true

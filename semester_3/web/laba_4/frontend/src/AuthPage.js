@@ -12,7 +12,7 @@ const AuthPage = () => {
     useEffect(() => {
         setUsername('');
         setPassword('');
-    }, [isLoginView]);2
+    }, [isLoginView]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -38,7 +38,7 @@ const AuthPage = () => {
                 }
             } else {
 
-                alert(data.message || "Ошибка аутентификации");
+                alert(data.error || data.message || "Ошибка аутентификации");
             }
         } catch (error) {
             alert("Нет связи с бэкендом");
