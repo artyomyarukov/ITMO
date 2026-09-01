@@ -251,9 +251,7 @@ tasks.register('dockerFunctionalTest', Exec) {
 }
 
 
-// =============================================================================
-// Сборка нескольких ревизий из Git в единой среде Docker
-// =============================================================================
+
 tasks.register('buildRevisions') {
     group = 'opi'
     description = 'Сборка нескольких коммитов/ревизий из Git в Docker'
@@ -261,14 +259,11 @@ tasks.register('buildRevisions') {
     doLast {
         def revisions = project.hasProperty('revisions')
                 ? project.property('revisions').toString().split(',')*.trim()
-                : ['HEAD']
-
+                : ['HEAD','HEAD~1']
         def execOps = services.get(ExecOperations)
         def stdout = new ByteArrayOutputStream()
-
-        // 1. Запоминаем текущую ветку:
         execOps.exec {
-            commandLine = ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
+            commandLine = ['git', 'rev-parse', '--abbrev-ref', 'HEAD',]
             standardOutput = stdout
         }
         def currentBranch = stdout.toString().trim()
@@ -280,15 +275,11 @@ tasks.register('buildRevisions') {
             }
             currentBranch = stdout.toString().trim()
         }
-
         println ">>> [buildRevisions] Исходная ветка: ${currentBranch}"
-
-        // 2. Собираем каждую ревизию:
         revisions.each { rev ->
             println "\n======================================================="
             println ">>> СБОРКА РЕВИЗИИ GIT: ${rev}"
             println "======================================================="
-
             execOps.exec {
                 commandLine = ['git', 'checkout', rev]
             }
