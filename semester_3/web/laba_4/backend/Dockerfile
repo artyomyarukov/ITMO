@@ -1,10 +1,7 @@
 FROM eclipse-temurin:21-jdk-alpine AS build
 WORKDIR /app
-COPY gradlew .
-COPY gradle gradle
-COPY build.gradle settings.gradle gradle.properties ./
-COPY src src
-RUN chmod +x ./gradlew && ./gradlew myBuild -x test
+COPY . .
+RUN gradle myBuild -x test --no-daemon
 
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
