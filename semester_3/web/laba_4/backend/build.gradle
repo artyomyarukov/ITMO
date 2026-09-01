@@ -251,43 +251,72 @@ tasks.register('dockerFunctionalTest', Exec) {
 }
 
 
+// =============================================================================
+// Сборка нескольких ревизий из Git в единой среде Docker
+// =============================================================================
 tasks.register('buildRevisions') {
     group = 'opi'
-    description = 'several revisions in Docker'
+    description = 'Сборка нескольких коммитов/ревизий из Git в Docker'
 
     doLast {
         def revisions = project.hasProperty('revisions')
                 ? project.property('revisions').toString().split(',')*.trim()
-                : ['HEAD', 'HEAD~1']
+                : ['HEAD']
+
+        def execOps = services.get(ExecOperations)
         def stdout = new ByteArrayOutputStream()
-        exec {
-            commandLine 'git', 'rev-parse', '--abbrev-ref', 'HEAD'
+
+        // 1. Запоминаем текущую ветку:
+        execOps.exec {
+            commandLine = ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
             standardOutput = stdout
         }
         def currentBranch = stdout.toString().trim()
         if (currentBranch.isEmpty() || currentBranch == "HEAD") {
             stdout.reset()
-            exec { commandLine 'git', 'rev-parse', 'HEAD'; standardOutput = stdout }
+            execOps.exec {
+                commandLine = ['git', 'rev-parse', 'HEAD']
+                standardOutput = stdout
+            }
             currentBranch = stdout.toString().trim()
         }
 
+        println ">>> [buildRevisions] Исходная ветка: ${currentBranch}"
 
+        // 2. Собираем каждую ревизию:
         revisions.each { rev ->
-            exec { commandLine 'git', 'checkout', rev }
+            println "\n======================================================="
+            println ">>> СБОРКА РЕВИЗИИ GIT: ${rev}"
+            println "======================================================="
+
+            execOps.exec {
+                commandLine = ['git', 'checkout', rev]
+            }
+
             stdout.reset()
-            exec { commandLine 'git', 'rev-parse', '--short', 'HEAD'; standardOutput = stdout }
+            execOps.exec {
+                commandLine = ['git', 'rev-parse', '--short', 'HEAD']
+                standardOutput = stdout
+            }
             def commitHash = stdout.toString().trim()
-            exec {
+
+            // Собираем Docker-образ:
+            execOps.exec {
                 workingDir = project.projectDir
-                commandLine 'docker', 'build', '-t', "web4-backend:${commitHash}", '.'
+                commandLine = ['docker', 'build', '-t', "web4-backend:${commitHash}", '.']
             }
 
             println ">>> [buildRevisions] Образ web4-backend:${commitHash} успешно создан!"
         }
-        exec { commandLine 'git', 'checkout', currentBranch }
+
+        // 3. Возвращаемся на исходную ветку:
+        println "\n>>> [buildRevisions] Возвращаемся на исходную ветку: ${currentBranch}..."
+        execOps.exec {
+            commandLine = ['git', 'checkout', currentBranch]
+        }
+        println ">>> [buildRevisions] Сборка всех ревизий завершена успешно!"
     }
 }
-
 
 
 
