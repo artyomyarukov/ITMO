@@ -18,9 +18,9 @@ public class AuthFunctionalTest {
     static void setUpBrowser() {
         playwright = Playwright.create();
         browser = playwright.chromium().launch(
-                new BrowserType.LaunchOptions()
+                /*new BrowserType.LaunchOptions()
                         .setHeadless(false)
-                        .setSlowMo(500)
+                        .setSlowMo(500)*/
         );
     }
 
@@ -50,6 +50,7 @@ public class AuthFunctionalTest {
         page.locator("input[placeholder='Имя пользователя']").fill("testuser");
         page.locator("input[placeholder='Пароль']").fill("password123");
         page.locator("button.auth-button").click();
+        page.waitForTimeout(2000);
         assertThat(page.locator(".header-bar")).containsText("testuser");
     }
 
