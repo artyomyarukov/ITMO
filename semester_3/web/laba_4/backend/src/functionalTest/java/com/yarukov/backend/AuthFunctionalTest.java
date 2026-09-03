@@ -22,6 +22,7 @@ public class AuthFunctionalTest {
                         .setHeadless(false)
                         .setSlowMo(500)*/
         );
+
     }
 
     @AfterAll

@@ -87,6 +87,7 @@ tasks.named('bootJar') {
 tasks.register('myBuild') {
     group = 'opi'
     description = 'build'
+    inputs.files(tasks.named('functionalTest'))
     inputs.files(tasks.named('bootJar'))
     outputs.files(tasks.named('bootJar'))
 }
@@ -135,7 +136,6 @@ tasks.register("diff") {
         def repoRoot = "git rev-parse --show-toplevel".execute(null, workingDir).text.trim()
         def currentDir = workingDir.absolutePath.replace("\\", "/")
         def prefix = currentDir.replace(repoRoot.replace("\\", "/"), "").replaceFirst("^/", "") + "/"
-
         def gitNeedComm = project.property("diffClasses").split(",")
         def gitStatus = "git status --porcelain".execute().text
         def changedFiles = []
@@ -205,7 +205,7 @@ tasks.register('functionalTest', Test) {
 }
 
 tasks.register('dockerModulTests', Exec) {
-    group = 'opi'
+    group = 'docker'
     description = 'isolation modul tests'
     dependsOn 'myBuild'
     commandLine 'docker', 'run', '--rm',
@@ -275,39 +275,42 @@ tasks.register('buildRevisions') {
             }
             currentBranch = stdout.toString().trim()
         }
-        println ">>> [buildRevisions] Исходная ветка: ${currentBranch}"
+
         revisions.each { rev ->
-            println "\n======================================================="
-            println ">>> СБОРКА РЕВИЗИИ GIT: ${rev}"
-            println "======================================================="
             execOps.exec {
                 commandLine = ['git', 'checkout', rev]
             }
-
             stdout.reset()
             execOps.exec {
                 commandLine = ['git', 'rev-parse', '--short', 'HEAD']
                 standardOutput = stdout
             }
             def commitHash = stdout.toString().trim()
-
-            // Собираем Docker-образ:
             execOps.exec {
                 workingDir = project.projectDir
                 commandLine = ['docker', 'build', '-t', "web4-backend:${commitHash}", '.']
             }
-
-            println ">>> [buildRevisions] Образ web4-backend:${commitHash} успешно создан!"
+            println "web4-backend:${commitHash} created"
         }
 
-        // 3. Возвращаемся на исходную ветку:
-        println "\n>>> [buildRevisions] Возвращаемся на исходную ветку: ${currentBranch}..."
+
         execOps.exec {
             commandLine = ['git', 'checkout', currentBranch]
         }
-        println ">>> [buildRevisions] Сборка всех ревизий завершена успешно!"
+        println "alll revisions build"
     }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
