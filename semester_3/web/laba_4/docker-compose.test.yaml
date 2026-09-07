@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: postgres-test
+    environment:
+      - POSTGRES_DB=laba_4
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d laba_4" ]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build: ./backend
+    container_name: backend-test
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/laba_4
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "8080" ]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+
+
+  frontend:
+    build: ./frontend
+    container_name: frontend-test
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  postgres_test_data:

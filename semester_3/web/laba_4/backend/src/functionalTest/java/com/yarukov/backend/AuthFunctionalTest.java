@@ -18,9 +18,9 @@ public class AuthFunctionalTest {
     static void setUpBrowser() {
         playwright = Playwright.create();
         browser = playwright.chromium().launch(
-                /*new BrowserType.LaunchOptions()
+                new BrowserType.LaunchOptions()
                         .setHeadless(false)
-                        .setSlowMo(500)*/
+                        .setSlowMo(500)
         );
 
     }

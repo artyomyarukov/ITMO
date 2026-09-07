@@ -16,10 +16,26 @@ services:
     container_name: lab4-backend-container
     ports:
       - "8080:8080"
+      - "9010:9010"
+      - "9011:9011"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/laba_4
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: password
+      JAVA_TOOL_OPTIONS: >-
+        -Dcom.sun.management.jmxremote
+        -Dcom.sun.management.jmxremote.port=9010
+        -Dcom.sun.management.jmxremote.rmi.port=9011
+        -Djava.rmi.server.hostname=127.0.0.1
+        -Dcom.sun.management.jmxremote.authenticate=true
+        -Dcom.sun.management.jmxremote.ssl=true
+        -Djavax.net.ssl.keyStorePassword=secret123
+        -Djavax.net.ssl.keyStore=/app/jmxRemoteConfig/jmx.keystore
+        -Dcom.sun.management.jmxremote.local.only=false
+        -Dcom.sun.management.jmxremote.password.file=/app/jmxRemoteConfig/jmxremote.password
+        -Dcom.sun.management.jmxremote.access.file=/app/jmxRemoteConfig/jmxremote.access
+        
+
     depends_on:
       - db
 

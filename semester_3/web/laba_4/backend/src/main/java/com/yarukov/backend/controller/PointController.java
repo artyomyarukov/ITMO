@@ -5,8 +5,12 @@ import com.yarukov.backend.model.Point;
 import com.yarukov.backend.model.User;
 import com.yarukov.backend.repository.PointRepository;
 import com.yarukov.backend.service.AuthService;
+
+import com.yarukov.backend.jmx.PointEvaluationEvent;
+import com.yarukov.backend.jmx.PointMissEvent;
 import com.yarukov.backend.service.PointService;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.yarukov.backend.jmx.PointCounter;
 import jakarta.validation.Valid;
 import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
@@ -33,10 +37,43 @@ public class PointController {
     @Autowired
     private MessageSource messageSource;
 
+    @Autowired
+    private PointCounter pointCounter;
+
     @PostMapping
     public ResponseEntity<Point> addPoint(@Valid @RequestBody PointRequest request) {
         User user = getCurrentUser();
-        return ResponseEntity.ok(pointService.savePoint(request, user));
+
+       PointEvaluationEvent evalEvent = new PointEvaluationEvent();
+        evalEvent.setUsername(user.getUsername());
+        evalEvent.setCoordinates(request.getX(), request.getY(), request.getR());
+        evalEvent.begin();
+        Point point = pointService.savePoint(request, user);
+        evalEvent.end();
+        evalEvent.setHitResult(point.isHit());
+        evalEvent.commit();
+
+
+
+        pointCounter.registerPoint(
+                user.getUsername(),
+                request.getX(),
+                request.getY(),
+                point.isHit()
+        );
+
+        if (!point.isHit()) {
+            PointMissEvent missEvent = new PointMissEvent(
+                    user.getUsername(),
+                    pointCounter.getCurrentStreak(),
+                    request.getX(),
+                    request.getY()
+            );
+            missEvent.commit();
+        }
+
+
+        return ResponseEntity.ok(point);
     }
 
     @GetMapping
